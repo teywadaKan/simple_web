@@ -2,6 +2,10 @@
 
 This project includes a complete Docker setup for both development and production environments.
 
+## Free API
+- https://jsonplaceholder.typicode.com (/users)
+- https://api.dicebear.com/7.x/avataaars/svg  (?seed=${user.username}&backgroundColor=b6e3f4,c0aede,d1d4f9)
+
 ## 📋 Prerequisites
 
 - Docker (version 20.10+)
