@@ -1,0 +1,53 @@
+# Backend Development Docker Compose
+version: '3.8'
+
+services:
+  # Backend API Service - Development Mode
+  backend-dev:
+    build:
+      context: ./back_end
+      dockerfile: Dockerfile.dev
+    container_name: simple-web-stack-backend-dev
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - NODE_ENV=development
+    volumes:
+      - ./back_end:/app
+      - node_modules_backend:/app/node_modules
+    networks:
+      - simple-web-stack-network
+    restart: unless-stopped
+    command: npm run dev
+
+  # Frontend React Service - Development Mode
+  frontend-dev:
+    build:
+      context: ./simple_web_stack
+      dockerfile: Dockerfile.dev
+    container_name: simple-web-stack-frontend-dev
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:3001
+    volumes:
+      - ./simple_web_stack:/app
+      - node_modules_frontend:/app/node_modules
+    networks:
+      - simple-web-stack-network
+    depends_on:
+      - backend-dev
+    restart: unless-stopped
+    command: npm run dev -- --host 0.0.0.0
+
+networks:
+  simple-web-stack-network:
+    driver: bridge
+    name: simple-web-stack-dev-network
+
+volumes:
+  node_modules_backend:
+    name: simple-web-stack-backend-dev-node-modules
+  node_modules_frontend:
+    name: simple-web-stack-frontend-dev-node-modules

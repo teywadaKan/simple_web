@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  # Backend API Service
+  backend:
+    build:
+      context: ./back_end
+      dockerfile: Dockerfile
+    container_name: simple-web-stack-backend
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - NODE_ENV=production
+    networks:
+      - simple-web-stack-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend React Service
+  frontend:
+    build:
+      context: ./simple_web_stack
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=http://localhost:3001
+    container_name: simple-web-stack-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:3001
+    networks:
+      - simple-web-stack-network
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+
+
+networks:
+  simple-web-stack-network:
+    driver: bridge
+    name: simple-web-stack-network
+
+volumes:
+  node_modules_backend:
+    name: simple-web-stack-backend-node-modules
+  node_modules_frontend:
+    name: simple-web-stack-frontend-node-modules
